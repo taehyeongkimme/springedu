@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+  <!-- log4jdbc-log4j2 -->
+  <logger name="jdbc.sqlonly" level="DEGUG">
+    <logger name="jdbc.sqltiming" level="INFO"/>
+    <logger name="jdbc.audit" level="WARN"/>
+    <logger name="jdbc.resultset" level="ERROR"/>
+    <logger name="jdbc.resultsettable" level="ERROR"/>
+    <logger name="jdbc.connection" level="INFO"/>
+  </logger>
+
+</configuration>
+
+
+<!-- logger	description
+jdbc.sqlonly	Logs only SQL. SQL executed within a prepared statement is automatically shown with it's bind arguments replaced with the data bound at that position, for greatly increased readability.
+jdbc.sqltiming	Logs the SQL, post-execution, including timing statistics on how long the SQL took to execute.
+jdbc.audit	Logs ALL JDBC calls except for ResultSets. This is a very voluminous output, and is not normally needed unless tracking down a specific JDBC problem.
+jdbc.resultset	Even more voluminous, because all calls to ResultSet objects are logged.
+jdbc.resultsettable	Log the jdbc results as a table. Level debug will fill in unread values in the result set.
+jdbc.connection	Logs connection open and close events as well as dumping all open connection numbers. This is very useful for hunting down connection leak problems. -->

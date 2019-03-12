@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.myapp.member.dao.MemberDAO">
+  <!-- 회원등록 -->
+  <insert id="memberInsert" parameterType="MemberDTO">
+
+		insert into member (id,pw,tel,nickName,gender,region,birth)
+		            values (#{id},#{pw},#{tel},#{nickName},#{gender},#{region},#{birth})
+
+  </insert>
+  
+  <!-- 회원 수정 -->
+  <update id="memberUpdate" parameterType="MemberDTO">
+    		update member set pw=#{pw},
+                          tel=#{tel},
+                          nickname=#{nickName},
+                          gender=#{gender},
+                          region=#{region},
+                          birth=#{birth} 
+		      where id=#{id} and pw=#{pw}
+  </update>
+  
+  <!-- 회원 삭제(회원용) -->
+  <delete id="memberDelete" parameterType="Map" >
+  		delete from member where id=#{id} and pw=#{pw}	
+  </delete>
+
+  <!-- 회원 수정(관리자용) -->
+  <delete id="adminMemberDelete" parameterType="String">
+    delete from member where id=#{id}	
+  </delete>
+
+  <!-- 회원 조회 -->
+  <select id="memberSelectOne" parameterType="String" resultType="MemberDTO">
+		select id, pw, nickname, gender, region, birth, tel, cdate, udate
+		  from member where id=#{id}    
+  </select>
+
+  <!-- 회원 목록 조회 -->
+  <select id="memberSelectList" resultType="MemberDTO">
+		select id, pw, nickname, gender, region, birth, tel, cdate, udate  
+      from member     
+  </select>
+</mapper>
+
+
+
+
+
+

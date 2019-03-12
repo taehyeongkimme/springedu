@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <typeAliases>
+    <typeAlias alias="MemberDTO" type="com.kh.myapp.member.dto.MemberDTO" />
+    <typeAlias alias="RbbsDTO" type="com.kh.myapp.bbs.dto.RbbsDTO" />
+    <typeAlias alias="BbsDTO" type="com.kh.myapp.bbs.dto.BbsDTO" />
+    <typeAlias alias="AuthorityDTO" type="com.kh.myapp.authority.dto.AuthorityDTO" />
+  </typeAliases> 
+</configuration>

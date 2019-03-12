@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<context:component-scan base-package="com.kh.myapp"/>
+	<context:property-placeholder location="classpath:/config/db.properties"/>	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+<!-- 	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" >
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:xe" />
+		<property name="username" value="spring" />	
+		<property name="password" value="spring1234" />	
+	</bean>
+ -->
+ 
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" >
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />	
+		<property name="password" value="${jdbc.password}" />	
+	</bean>
+ 
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+	
+	<!-- mybatis -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:/config/mybatis-config.xml" />
+		<property name="mapperLocations" value="classpath*:/mappers/**/*mapper.xml" />
+	</bean>
+	
+	<!-- mybatis-spring -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- Google 소셜 로그인 연결 설정 -->
+	<bean id="googleConnectionFactory" class="org.springframework.social.google.connect.GoogleConnectionFactory">
+		<constructor-arg value="126247722052-vba6646nj36u45659ilvn3clk36rc5ck.apps.googleusercontent.com"/>
+		<constructor-arg value="FqbzZSJiTnSVDSed-3iRQWrN"/>
+	</bean>
+	
+	<!-- 승인된 자바스크립트 원본과 승인된 redirection URI -->
+	<bean id="googleOAuth2Parameters" class="org.springframework.social.oauth2.OAuth2Parameters">
+		<property name="scope" value="https://www.googleapis.com/auth/plus.login"/>
+		<property name="redirectUri" value="http://localhost:8080/springedu/googleSignInCallback"></property>
+	</bean>
+	
+	<context:component-scan base-package="com.kh.myapp" >
+		<context:exclude-filter type="annotation" 
+											expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+</beans>
+

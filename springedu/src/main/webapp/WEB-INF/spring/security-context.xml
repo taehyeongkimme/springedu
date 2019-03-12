@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<!-- 사용자 비밀번호 인코딩 -->
+<!-- <bean id="customPasswordEncoder" class="com.kh.myapp.common.CustomNoOpPasswordEncoder"/> -->
+<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+<!-- 권한접근 예외발생시 실행하는 bean -->
+<!-- <bean id="customAccessDenyed" class="com.kh.myapp.common.CustomAccessDenyHandler"/> -->
+
+
+
+<bean id="memberSvcImpl" class="com.kh.myapp.member.service.MemberSvcImpl"/>
+
+<sec:http use-expressions="true">
+	<!-- crsf 적용안함 -->
+	<sec:csrf disabled="true"/>
+
+	<!-- 로그인 -->
+	<sec:form-login login-page="/login/loginForm" 
+									username-parameter="id" 
+									password-parameter="pw" />
+	
+	<!-- 로그아웃 -->
+	<sec:logout logout-url="/login/logout"
+							logout-success-url="/login/loginForm?logout"
+							invalidate-session="true" delete-cookies="remember-me,JSESSION_ID"/>
+
+
+	<!-- url매핑 resource에 관한 권한 세팅 -->
+	<!-- <sec:intercept-url pattern="/example/all" access="permitAll()"/>
+	<sec:intercept-url pattern="/test" access="permitAll()"/>
+	<sec:intercept-url pattern="/example/member" access="hasRole('ROLE_USER')"/>
+	<sec:intercept-url pattern="/example/admin" access="hasRole('ROLE_ADMIN')"/>
+	<sec:intercept-url pattern="/**" access="permitAll()"/> -->
+	
+	<!-- 접근제한 예외발생시 특정URI 지정하거나 AccessDenied Handler를 직접구현한다 -->
+	<!-- <sec:access-denied-handler ref="customAccessDenyed"/> -->
+	<sec:access-denied-handler error-page="/accessDeny"/>
+
+	<!-- 자동 로그인 60*60*7 = 604800 -->
+	<sec:remember-me data-source-ref="dataSource"
+									 token-validity-seconds="604800"/>
+									 
+</sec:http>
+
+
+
+
+
+
+<sec:authentication-manager>
+	<!-- userDetailsService 구현클래스 com.kh.myapp.member.service.MemberSvcImpl -->
+	<sec:authentication-provider user-service-ref="memberSvcImpl">
+	
+<!-- 		<sec:user-service>
+			<sec:user name="member" password="member" authorities="ROLE_MEMBER"/>
+			<sec:user name="admin" password="admin" authorities="ROLE_MEMBER,ROLE_ADMIN"/>
+		</sec:user-service>	 -->	
+		<sec:password-encoder ref="bcryptPasswordEncoder"/>
+		
+	</sec:authentication-provider>
+	
+</sec:authentication-manager>
+
+
+</beans>

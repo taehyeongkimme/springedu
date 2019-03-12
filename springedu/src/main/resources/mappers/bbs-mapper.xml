@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.bbs">
+	<!-- 글쓰기 -->
+	<insert id="write">
+		INSERT INTO board (bnum,btitle,bid,bnickname,bhit,bcontent,bgroup,bstep,bindent)
+	  		 values(boardnum_seq.nextval,#{btitle},#{bid},#{bnickname},0,#{bcontent},boardnum_seq.currval,0,0)
+	</insert>
+	
+	<!-- 글읽기 -->
+	<select id="view" resultType="BbsDTO">
+		SELECT bnum,btitle,bid,bnickname,bcdate,budate,
+			   	 bhit,bcontent,bgroup,bstep,bindent
+			from board
+		 where bnum = #{bnum}
+	</select>
+	
+	<!-- 조회수 증가 -->
+	<update id="updateHit">
+		update board set bhit= bhit + 1 
+		 where bnum=#{bnum}
+	</update>
+		
+	<!-- 글수정 -->
+	<update id="modify">
+		update board set
+		btitle=#{btitle} , bcontent=#{bcontent}, budate=sysdate
+		where bnum =#{bnum}
+	</update>
+	
+	<!-- 삭제 처리 -->
+	<!-- 1) 답글 존재 -->
+	<update id="update_isdel">
+		update board set isdel = 'Y' where bnum= #{bnum}
+	</update>
+	
+	<!-- 2) 답글 미존재 -->
+	<delete id="delete">
+		delete from board where bnum = #{bnum}
+	</delete>
+	
+	<!-- 답글 존재 유무 판단 -->
+	<select id="isReply" resultType="int">
+		select count(bnum) from board
+		 where bgroup in(select bgroup from board t1 
+											where t1.bnum=#{bnum}) 
+			 and bnum != #{bnum} 
+	<!-- CDATA태그는 순수 문자열로 인식, 공백이 오면 안됨  --> 
+	<!-- and bnum <![CDATA[<>]]> #{bnum} --> 
+	</select>
+	
+	<!-- 원글가져오기 -->
+	<select id="replyView" resultType="BbsDTO">
+		SELECT bnum,btitle,bid,bnickname,bcdate,budate,
+		       bhit,bcontent,bgroup,bstep,bindent
+		  from board 
+		 where bnum = #{bnum}
+	</select>
+	
+	<!-- 답글쓰기 -->
+	<!-- 1) 이전 답글 step 업데이트(원글 그룹에 대한 세로정렬 재정의) -->
+	<update id="updateStep">
+		update board set bstep = bstep + 1 
+		 where bgroup = #{bgroup} and bstep > #{bstep}
+		
+	</update>
+	
+	<!-- 2) 답글 등록 -->
+	<insert id="reply">
+		INSERT INTO board (bnum, btitle, bid, bnickname,
+											 bhit, bcontent, bgroup, bstep, bindent) 
+				 VALUES (boardnum_seq.nextval, 
+				 				#{btitle},#{bid},
+				 				#{bnickname}, 
+				 				0,
+				 				#{bcontent},
+				 				#{bgroup},
+				 				#{bstep}+1,
+				 				#{bindent}+1)
+	</insert>
+	
+	<!-- 게시글 총계 -->
+	<select id="totalRec" resultType="Integer">
+		SELECT count(*) totalRec from board 
+	</select>
+	
+	<!-- 글목록 전체 -->
+	<select id="lsitOld" resultType="BbsDTO">
+		SELECT bnum,btitle,bid,bnickname,bcdate,budate,
+			     bhit,bcontent,bgroup,bstep,bindent
+		  FROM (select * from board order by bgroup desc, bstep asc)		 
+	</select>
+	
+	<!-- 글목록 요청 페이지 -->
+	<select id="list" resultType="BbsDTO">
+		select t2.* 
+			from (select row_number() over(order by bgroup desc, bstep asc) as num,t1.* 
+				    from board t1)t2 
+		 where num between #{startRec} and #{endRec} 
+	</select>
+	
+	<!-- 검색 목록 -->
+	<select id="flist" resultType="BbsDTO">
+		select t2.*
+		  from (select row_number() over (order by bgroup desc, bstep asc) as num, t1.*
+							from board t1
+						 where bnum > 0
+		<bind name="keyword" value="'%'+keyword+'%'"/>				  
+		<choose>
+			<!-- 제목+내용 -->
+			<when test="searchType == 'TC.toString()'">
+				and btitle like #{keyword} or bcontent like #{keyword}
+			</when>
+			
+			<!-- 제목 -->
+			<when test="searchType == 'T.toString()'">
+				and btitle like #{keyword} 
+			</when>
+			
+			<!-- 내용 -->
+			<when test="searchType == 'C.toString()'">
+				and bcontent like #{keyword} 	
+			</when>
+			
+			<!-- 닉네임 -->
+			<when test="searchType == 'N.toString()'">
+				and bnickname like #{keyword}
+			</when>
+			
+			<!-- 아이디 -->
+			<when test="searchType == 'I.toString()'">
+				and bid like #{keyword} 
+			</when>
+			
+			<!-- 제목 +내용 +작성자 -->
+			<otherwise>
+				and btitle like #{keyword} or bcontent like #{keyword} or bid like #{keyword}
+			</otherwise>
+		</choose>
+			)t2 where num between #{startRecord} and #{endRecord} 
+	</select>
+	
+	<!-- 검색 총계 -->
+	<select id="searchTotalRec" resultType="Integer">
+		select count(*) totalRec
+		  from (select row_number() over (order by bgroup desc, bstep asc) as num, t1.*
+							from board t1
+						 where bnum > 0
+		<bind name="keyword" value="'%'+keyword+'%'"/>				  
+		<choose>
+			<!-- 제목+내용 -->
+			<when test="searchType == 'TC.toString()'">
+				and btitle like #{keyword} or bcontent like #{keyword}
+			</when>
+			
+			<!-- 제목 -->
+			<when test="searchType == 'T.toString()'">
+				and btitle like #{keyword} 
+			</when>
+			
+			<!-- 내용 -->
+			<when test="searchType == 'C.toString()'">
+				and bcontent like #{keyword} 	
+			</when>
+			
+			<!-- 닉네임 -->
+			<when test="searchType == 'N.toString()'">
+				and bnickname like #{keyword}
+			</when>
+			
+			<!-- 아이디 -->
+			<when test="searchType == 'I.toString()'">
+				and bid like #{keyword} 
+			</when>
+			
+			<!-- 제목 +내용 +작성자 -->
+			<otherwise>
+				and btitle like #{keyword} or bcontent like #{keyword} or bid like #{keyword}
+			</otherwise>
+		</choose>
+			)t2 
+	</select>
+	
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
