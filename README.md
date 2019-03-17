@@ -12,11 +12,20 @@ Spring Framework로 구현한 웹 게시판입니다.
 
  사용기술
 ------------------
-* Bootstrap4, HTML5, CSS3, JavaScript, JQuery, Ajax, Restful, Mybatis, Oracle, Spring Framework, Spring Security, MVC2패턴 적용
+* Bootstrap4
+* HTML5/CSS/JS
+* JQuery
+* Ajax/Restful
+* Mybatis
+* Oracle
+* Spring Framework
 
+##Demo
+------------------
+syntax: (https://youtu.be/cCluo1MaAWg)
 
  보완계획
 ------------------
-* 파일업로드
+* 파일업로드 추가
 
-</hr>
+<hr/>
