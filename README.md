@@ -20,7 +20,7 @@ Spring Framework로 구현한 웹 게시판입니다.
 * Oracle
 * Spring Framework
  
- 
+ 동영상시연
 ------------------
 https://youtu.be/cCluo1MaAWg
 
