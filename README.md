@@ -22,7 +22,7 @@ Spring Framework로 구현한 웹 게시판입니다.
 
 ##Demo
 ------------------
-syntax: (https://youtu.be/cCluo1MaAWg)
+(https://youtu.be/cCluo1MaAWg)
 
  보완계획
 ------------------
